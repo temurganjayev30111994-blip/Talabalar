@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>261-guruh Talabalar Bazasi (1-42)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-200/80 overflow-hidden">
+        
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-indigo-800 p-6 text-white">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <div class="bg-white/10 p-2.5 rounded-xl backdrop-blur-md">
+                            <i class="fa-solid fa-graduation-cap text-2xl text-blue-200"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold tracking-tight">261-guruh Talabalar Bazasi</h1>
+                            <p class="text-blue-100 text-xs sm:text-sm mt-0.5">Rasmiy talabalar ro'yxati va davomati</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/10 px-4 py-2 rounded-xl text-sm font-semibold self-stretch sm:self-auto justify-between sm:justify-start">
+                    <span class="text-blue-200 text-xs uppercase tracking-wider font-bold">Jami talabalar:</span>
+                    <span id="studentCounter" class="bg-yellow-400 text-slate-900 px-2.5 py-0.5 rounded-md text-xs font-black">42 ta</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls: Search & Filters -->
+        <div class="p-4 sm:p-5 bg-slate-50 border-b border-slate-200 flex flex-col lg:flex-row gap-3 justify-between items-center">
+            <div class="relative w-full lg:w-80">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <input type="text" id="searchInput" oninput="filterStudents()" placeholder="F.I.SH bo'yicha qidiruv..." 
+                       class="w-full pl-10 pr-9 py-2.5 bg-white rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm shadow-sm transition">
+                <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Davomat bo'yicha filtr tugmalari -->
+            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
+                <button onclick="setStatusFilter('all')" id="btnFilterAll" class="px-3.5 py-2 bg-indigo-600 text-white rounded-xl text-xs font-semibold shadow-sm transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-users text-xs"></i> Barchasi
+                </button>
+                <button onclick="setStatusFilter('present')" id="btnFilterPresent" class="px-3.5 py-2 bg-white text-emerald-700 border border-emerald-300 hover:bg-emerald-50 rounded-xl text-xs font-semibold shadow-sm transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-user-check text-xs"></i> Darsda borlar
+                </button>
+                <button onclick="setStatusFilter('absent')" id="btnFilterAbsent" class="px-3.5 py-2 bg-white text-rose-700 border border-rose-300 hover:bg-rose-50 rounded-xl text-xs font-semibold shadow-sm transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-user-xmark text-xs"></i> Darsda yo'qlar
+                </button>
+                <button onclick="resetSearch()" class="px-3.5 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-xl text-xs font-medium transition shadow-sm flex items-center gap-1.5">
+                    <i class="fa-solid fa-rotate-right text-xs"></i> Tiklash
+                </button>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-100 text-slate-600 uppercase text-[11px] font-bold tracking-wider border-b border-slate-200">
+                        <th class="py-3.5 px-4 w-16 text-center">T/r</th>
+                        <th class="py-3.5 px-4">Talabaning F.I.SH.</th>
+                        <th class="py-3.5 px-4 w-28 text-center">Guruh</th>
+                        <th class="py-3.5 px-4 w-32 text-center">Davomat</th>
+                    </tr>
+                </thead>
+                <tbody id="studentTableBody" class="divide-y divide-slate-200 text-slate-700 text-sm">
+                    <!-- Dynamic JavaScript Rendering -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer -->
+        <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+            <a href="https://t.me/temur_261" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-600 hover:text-sky-700 border border-sky-200 rounded-lg font-semibold transition shadow-sm">
+                <i class="fa-brands fa-telegram text-base"></i> @temur_261
+            </a>
+            <span id="filteredInfo" class="font-medium text-slate-600">Ko'rsatildi: 42 / 42</span>
+        </div>
+    </div>
+
+    <script>
+        const rawStudentsList = [
+            "ABDALIMOVA LOBAR QAHRAMONOVNA",
+            "ABDULLAYEV MAHMUDBEK SHAKIR O'G'LI",
+            "ALIMBOYEV JAVOHIR JO'RABEK O'G'LI",
+            "AMINOV ALIBEK BAGANDIK O'G'LI",
+            "ATANAZAROVA MAFTUNA HAJIBOY QIZI",
+            "ATAXANOV NURADDIN ALIMBAY O'G'LI",
+            "BAXTIYOROV NURSULTON DILYOR O'G'LI",
+            "BEGMAMATOV BAXTIYORJON ULUG'BEK O'G'LI",
+            "BOBOJONOV NORMAT RO'ZIMBOY O'G'LI",
+            "CHARIYEV JASURBEK AZIMBAY O'G'LI",
+            "GANJAYEV TEMURXON NURADDIN O'G'LI",
+            "HAMROYEV FARRUHBEK JAMOLBEK O'G'LI",
+            "ISMAILOV JASURBEK BAXROM O'G'LI",
+            "JUMABOYEVA GULIRA'NO DILSHOD QIZI",
+            "JUMANAZAROVA SARVINOZ MANSUR QIZI",
+            "MARDONOV NURBEK ILG'OR O'G'LI",
+            "MATKARIMOVA BAXOROY FARXOD QIZI",
+            "MURATBAYEV NURDAULET ALIZAK ULI",
+            "NAZARALIYEV IMOMALI NURALI O'G'LI",
+            "OMONGALDIYEV SUHROBBEK HURMAT O'G'LI",
+            "O'RINBAYEV BEYJON BOBAXON O'G'LI",
+            "ORTIG'ALIYEVA IRODA G'AYRAT QIZI",
+            "OTABOYEVA XURSHIDABONU RAJABBOY QIZI",
+            "QO'ZIBOYEV UMRBEK JAVLONBEK O'G'LI",
+            "RAJABOV ASLBEK IKROM O'G'LI",
+            "RAJABOVA LOLAJON ODILBEKOVNA",
+            "RO'ZIMBOYEV DASTONBEK JO'RABEK O'G'LI",
+            "ROZIQJONOV OZODBEK SHERALI O'G'LI",
+            "RO'ZMATOV BUNYODBEK UMRBEK O'G'LI",
+            "SABIROVA OZODA RUSTAM QIZI",
+            "SAMANDAROV JAVOHIR MUZAFFAR O'G'LI",
+            "SHONAZAROVA OYMONJON OYBEK QIZI",
+            "SIROJIDDINOV SALOXIDDIN SHUXRATJON O'G'LI",
+            "SOBIROVA UMIDA HAMZA QIZI",
+            "TURAYEVA YULDUZ ULUG'BEK QIZI",
+            "UDAMOV SHAHRUHMIRZO ULUG'BEK O'G'LI",
+            "XAMROYEVA NAFISA VOXIDJON QIZI",
+            "XUDAYBERGANOV ELMUROD O'KTAMBOY O'G'LI",
+            "XUDAYNAZAROV JAMSHIDBEK HASAN O'G'LI",
+            "XUDOYBERGANOV JAVOHIR NE'MATJAN O'G'LI",
+            "YAZIMOV RO'ZIMBOY QABULBOY O'G'LI",
+            "YUSUPOV OBIDJON MURODJON O'G'LI"
+        ];
+
+        // Matnni bosh harfi katta, qolganlarini kichik qilish funksiyasi
+        function toTitleCase(str) {
+            let formatted = str.toLowerCase().split(' ').map(word => {
+                if (!word) return '';
+                return word.charAt(0).toUpperCase() + word.slice(1);
+            }).join(' ');
+
+            // "O'g'li" va "Qizi" so'zlarini kichik harfga o'tkazish
+            formatted = formatted.replace(/\bO'g'li\b/g, "o'g'li")
+                                 .replace(/\bO‘g‘li\b/g, "o‘g‘li")
+                                 .replace(/\bQizi\b/g, "qizi");
+
+            return formatted;
+        }
+
+        // Darsda yo'q talabalar ro'yxati (1-tartib raqamidagi talaba ham qo'shildi)
+        const absentIndices = new Set([1, 5, 6, 7, 10, 12, 13, 15, 16, 22, 28, 33, 35, 39, 41]);
+
+        // Talabalar obyektlarini tayyorlash
+        const studentsList = rawStudentsList.map((name, index) => {
+            const id = index + 1;
+            return {
+                id: id,
+                name: toTitleCase(name),
+                isPresent: !absentIndices.has(id)
+            };
+        });
+
+        let currentStatusFilter = 'all';
+
+        const tableBody = document.getElementById('studentTableBody');
+        const filteredInfoEl = document.getElementById('filteredInfo');
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+
+        // Jadvalni render qilish
+        function renderStudents(items) {
+            tableBody.innerHTML = '';
+            
+            if (items.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="text-center py-10 text-slate-400">
+                            <i class="fa-regular fa-folder-open text-3xl mb-2 block"></i>
+                            Bunday talaba topilmadi
+                        </td>
+                    </tr>
+                `;
+                filteredInfoEl.textContent = `Ko'rsatildi: 0 / ${studentsList.length}`;
+                return;
+            }
+
+            items.forEach((student) => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50 transition-colors duration-150";
+                
+                const statusBadge = student.isPresent 
+                    ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Bor
+                       </span>`
+                    : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Yo'q
+                       </span>`;
+
+                row.innerHTML = `
+                    <td class="py-3 px-4 text-center font-mono text-xs font-semibold text-slate-400">${student.id}</td>
+                    <td class="py-3 px-4 font-semibold text-slate-800">${highlightMatch(student.name, searchInput.value)}</td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="inline-block bg-slate-100 border border-slate-200 text-slate-700 text-xs px-2.5 py-1 rounded-md font-medium">
+                            261
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-center">
+                        ${statusBadge}
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            filteredInfoEl.textContent = `Ko'rsatildi: ${items.length} / ${studentsList.length}`;
+        }
+
+        // Qidiruv va filtrlar
+        function filterStudents() {
+            const query = searchInput.value.trim().toLowerCase();
+            
+            if (query.length > 0) {
+                clearSearchBtn.classList.remove('hidden');
+            } else {
+                clearSearchBtn.classList.add('hidden');
+            }
+
+            const filtered = studentsList.filter(student => {
+                const matchesQuery = student.name.toLowerCase().includes(query);
+                if (currentStatusFilter === 'present') {
+                    return matchesQuery && student.isPresent;
+                } else if (currentStatusFilter === 'absent') {
+                    return matchesQuery && !student.isPresent;
+                }
+                return matchesQuery;
+            });
+            
+            renderStudents(filtered);
+        }
+
+        // Status bo'yicha saralash
+        function setStatusFilter(status) {
+            currentStatusFilter = status;
+            
+            const btnAll = document.getElementById('btnFilterAll');
+            const btnPresent = document.getElementById('btnFilterPresent');
+            const btnAbsent = document.getElementById('btnFilterAbsent');
+
+            btnAll.className = status === 'all' 
+                ? "px-3.5 py-2 bg-indigo-600 text-white rounded-xl text-xs font-semibold shadow-sm transition flex items-center gap-1.5"
+                : "px-3.5 py-2 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 rounded-xl text-xs font-semibold shadow-sm transition flex items-center gap-1.5";
+
+            btnPresent.className = status === 'present' 
+                ? "px-3.5 py-2 bg-emerald-600 text-white rounded-xl text-xs font-semibold shadow-sm transition flex items-center gap-1.5"
+                : "px-3.5 py-2 bg-white text-emerald-700 border border-emerald-300 hover:bg-emerald-50 rounded-xl text-xs font-semibold shadow-sm transition flex items-center gap-1.5";
+
+            btnAbsent.className = status === 'absent' 
+                ? "px-3.5 py-2 bg-rose-600 text-white rounded-xl text-xs font-semibold shadow-sm transition flex items-center gap-1.5"
+                : "px-3.5 py-2 bg-white text-rose-700 border border-rose-300 hover:bg-rose-50 rounded-xl text-xs font-semibold shadow-sm transition flex items-center gap-1.5";
+
+            filterStudents();
+        }
+
+        // Qidirilayotgan so'zni belgilash
+        function highlightMatch(text, query) {
+            if (!query) return text;
+            const regex = new RegExp(`(${query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, '<mark class="bg-yellow-200 text-slate-900 rounded px-0.5">$1</mark>');
+        }
+
+        function clearSearch() {
+            searchInput.value = '';
+            clearSearchBtn.classList.add('hidden');
+            filterStudents();
+        }
+
+        function resetSearch() {
+            searchInput.value = '';
+            clearSearchBtn.classList.add('hidden');
+            setStatusFilter('all');
+        }
+
+        // Sahifa yuklanganda ishga tushirish
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStudents(studentsList);
+        });
+    </script>
+</body>
+</html>
